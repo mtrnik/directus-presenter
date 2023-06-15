@@ -57,6 +57,8 @@ export default defineNuxtComponent({
         }
     },
     mounted() {
+        window.addEventListener('keydown', this.handleKeyDown);
+
         this.parseXmlToVerses()
         this.clearSpecialCharactersFromVerses()
         this.prepareVersesOrder( this.song.verses, this.song.verse_order )
@@ -101,6 +103,32 @@ export default defineNuxtComponent({
             }
 
             this.song.ordered_verses = orderedVerses.slice()
+        },
+
+        handleKeyDown(event: KeyboardEvent) {
+            switch (event.key) {
+                case 'ArrowUp':
+                    event.preventDefault()
+                    this.handleArrowUp();
+                    break;
+                case 'ArrowDown':
+                    event.preventDefault()
+                    this.handleArrowDown();
+                    break;
+                // Add more cases for other key codes if needed
+            }
+        },
+
+        handleArrowUp() {
+            console.debug('handleArrowUp')
+            // Handle the arrow up key event
+            // Implement your logic here
+        },
+
+        handleArrowDown() {
+            console.debug('handleArrowDown')
+            // Handle the arrow down key event
+            // Implement your logic here
         }
     }
 })
