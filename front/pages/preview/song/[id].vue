@@ -1,7 +1,7 @@
 <template>
     <ul>
-        <li v-for="verse in song.ordered_verses">
-            <p v-html="verse.value" class="flex items-center h-screen justify-center text-6xl text-center bg-black text-white p-16 leading-loose"></p>
+        <li v-for="verse in song.ordered_verses" :key="verse._id">
+            <p :id="verse._id" v-html="verse.value" class="flex items-center h-screen justify-center text-6xl text-center bg-black text-white p-16 leading-loose"></p>
         </li>
     </ul>
 <!--    <pre>{{ song }}</pre>-->
@@ -34,6 +34,7 @@ interface Verse {
     label: string;
     type: string;
     value: string;
+    _id?: string
 }
 
 
@@ -85,14 +86,18 @@ export default defineNuxtComponent({
 
             if ( verseOrder ) {
                 const verseLabels = verseOrder.split(' ');
-                for (const label of verseLabels) {
-                    const matchingVerse = verses.find((verse) => `${verse.type}${verse.label}` === label);
-                    if (matchingVerse) {
-                        orderedVerses.push(matchingVerse);
+                for (const labelIndex in verseLabels) {
+                    const label = verseLabels[labelIndex]
+                    const verse = verses.find((verse) => `${verse.type}${verse.label}` === label);
+                    if ( verse ) {
+                        orderedVerses.push({ ...verse, _id: `${labelIndex}-${verse.type}${verse.label}` });
                     }
                 }
             } else {
-                orderedVerses.push( ...verses )
+                for ( const verseIndex in verses ) {
+                    const verse = verses[verseIndex]
+                    orderedVerses.push( { ...verse, _id: `${verseIndex}-${verse.type}${verse.label}` } )
+                }
             }
 
             this.song.ordered_verses = orderedVerses.slice()
