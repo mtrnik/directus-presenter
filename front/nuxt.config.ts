@@ -2,5 +2,16 @@
 export default defineNuxtConfig({
   // @ts-ignore
   ssr: false,
-  devtools: { enabled: true }
+  devtools: { enabled: true },
+
+  css: [
+      '~/assets/css/main.css'
+  ],
+
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
 })

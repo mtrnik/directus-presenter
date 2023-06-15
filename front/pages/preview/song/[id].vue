@@ -1,10 +1,10 @@
 <template>
     <ul>
         <li v-for="verse in song.ordered_verses">
-            <p v-html="verse.value"></p>
+            <p v-html="verse.value" class="flex items-center h-screen justify-center text-6xl text-center bg-black text-white p-16 leading-loose"></p>
         </li>
     </ul>
-    <pre>{{ song }}</pre>
+<!--    <pre>{{ song }}</pre>-->
 </template>
 
 <script lang="ts">
