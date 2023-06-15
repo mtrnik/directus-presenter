@@ -1,7 +1,7 @@
 <template>
     <ul>
         <li v-for="verse in song.ordered_verses">
-            {{ verse.value }}
+            <p v-html="verse.value"></p>
         </li>
     </ul>
     <pre>{{ song }}</pre>
@@ -57,6 +57,7 @@ export default defineNuxtComponent({
     },
     mounted() {
         this.parseXmlToVerses()
+        this.clearSpecialCharactersFromVerses()
         this.prepareVersesOrder( this.song.verses, this.song.verse_order )
     },
     methods: {
@@ -69,6 +70,16 @@ export default defineNuxtComponent({
                 this.song.verses = song.verses || []
             }
         },
+
+        clearSpecialCharactersFromVerses() {
+            for ( const verse of this.song.verses ) {
+                const cleanedValue = verse.value.replace(/\[(.*?)\]/g, ''); // Remove text inside square brackets
+                const formattedValue = cleanedValue.replace(/\n/g, '<br />'); // Replace '\n' with '<br />'
+
+                verse.value = formattedValue
+            }
+        },
+
         prepareVersesOrder( verses: Verse[], verseOrder: string | null ) {
             const orderedVerses = [];
 
