@@ -1,4 +1,9 @@
 <template>
+    <ul>
+        <li v-for="verse in song.ordered_verses">
+            {{ verse.value }}
+        </li>
+    </ul>
     <pre>{{ song }}</pre>
 </template>
 
@@ -21,6 +26,7 @@ interface Song {
     search_title: string;
     search_lyrics: string;
     verses: Verse[]
+    ordered_verses: Verse[]
     [key: string]: any; // Index signature for arbitrary string keys
 }
 
@@ -50,23 +56,40 @@ export default defineNuxtComponent({
         }
     },
     mounted() {
-        // console.debug('mounted', JSON.stringify(this.song) )
         this.parseXmlToVerses()
+        this.prepareVersesOrder( this.song.verses, this.song.verse_order )
     },
     methods: {
         async parseXmlToVerses() {
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(this.song.lyrics, 'application/xml');
-            const songNode = xmlDoc.querySelector('song');
-            if ( songNode ) {
-                const song: Record<string, any> = xmlNodeToObject( songNode );
-                this.song.verses = song.lyrics.verses
+            const lyricsNode = xmlDoc.querySelector('lyrics');
+            if ( lyricsNode ) {
+                const song = xmlNodeToObject( lyricsNode );
+                this.song.verses = song.verses || []
             }
+        },
+        prepareVersesOrder( verses: Verse[], verseOrder: string | null ) {
+            const orderedVerses = [];
+
+            if ( verseOrder ) {
+                const verseLabels = verseOrder.split(' ');
+                for (const label of verseLabels) {
+                    const matchingVerse = verses.find((verse) => `${verse.type}${verse.label}` === label);
+                    if (matchingVerse) {
+                        orderedVerses.push(matchingVerse);
+                    }
+                }
+            } else {
+                orderedVerses.push( ...verses )
+            }
+
+            this.song.ordered_verses = orderedVerses.slice()
         }
     }
 })
 
-function xmlNodeToObject(node: Element): Song {
+function xmlNodeToObject(node: Element): Partial<Song> {
     const obj: Partial<Song> = {};
     const children = node.children;
 
@@ -96,7 +119,7 @@ function xmlNodeToObject(node: Element): Song {
         }
     }
 
-    return obj as Song;
+    return obj as Partial<Song>;
 }
 
 </script>
