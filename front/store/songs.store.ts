@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import {Song, SongAnchor, SongVerse} from "~/types/types";
+import {useServicesStore} from "~/store/services.store";
 
 export const useSongsStore = defineStore('songs', {
     state: () => {
@@ -14,18 +15,25 @@ export const useSongsStore = defineStore('songs', {
             const { $directus } = useNuxtApp()
 
             this.song = await $directus.items('songs').readOne( songId ) as Song
-            this.song.verses = this.parseXmlToVerses( this.song )
-            this.clearSpecialCharactersFromVerses( this.song )
-            this.song.ordered_verses = this.prepareVersesOrder( this.song.verses, this.song.verse_order )
+            this.song = this.processSong( this.song )
 
             if ( this.song.ordered_verses?.[0]._id ) {
                 this.currentAnchor = { id: this.song.ordered_verses[0]._id, index: 0 }
             }
         },
 
+        processSong(song: Song): Song {
+            console.debug('processSong', song)
+            song.verses = this.parseXmlToVerses( song )
+            this.clearSpecialCharactersFromVerses( song )
+            song.ordered_verses = this.prepareVersesOrder( song.verses, song.verse_order )
+
+            return song
+        },
+
         parseXmlToVerses(song: Song) {
             const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(this.song.lyrics, 'application/xml');
+            const xmlDoc = parser.parseFromString( song.lyrics, 'application/xml');
             const lyricsNode = xmlDoc.querySelector('lyrics');
             if ( lyricsNode ) {
                 const song = xmlNodeToObject( lyricsNode );
@@ -83,6 +91,9 @@ export const useSongsStore = defineStore('songs', {
             if ( this.currentAnchor.index > 0 ) {
                 this.currentAnchor.index--
                 this.changeSelectedSongVerse()
+            } else {
+                this.currentAnchor = {  id: '', index: -1 } as SongAnchor
+                useServicesStore().moveToPreviousSong()
             }
         },
 
@@ -90,13 +101,16 @@ export const useSongsStore = defineStore('songs', {
             if ( this.currentAnchor.index < this.song.ordered_verses.length - 1 ) {
                 this.currentAnchor.index++
                 this.changeSelectedSongVerse()
+            } else {
+                this.currentAnchor = {  id: '', index: -1 } as SongAnchor
+                useServicesStore().moveToNextSong()
             }
         },
 
         changeSelectedSongVerse() {
             if ( this.song.ordered_verses[this.currentAnchor.index]._id ) {
                 this.currentAnchor.id = this.song.ordered_verses[ this.currentAnchor.index ]._id ?? ''
-                scrollToElement( this.currentAnchor.id )
+                localStorage.setItem('directus-presenter-live-verse-anchor', this.currentAnchor.id )
             }
         }
 
@@ -135,14 +149,5 @@ function xmlNodeToObject(node: Element): Partial<Song> {
     }
 
     return obj as Partial<Song>;
-}
-
-function scrollToElement(id: string) {
-    const element = document.getElementById(id);
-    element?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-        inline: 'nearest',
-    });
 }
 

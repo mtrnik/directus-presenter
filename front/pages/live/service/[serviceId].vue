@@ -1,29 +1,31 @@
 <template>
     <div>
-        <p v-for="songId in servicesStore.sortedSongs">
-            <p @click="openPresenter( songId.song.id )">{{ songId.song.title }}</p>
+        <h3 @click="servicesStore.goLive()">Start presentation</h3>
+
+        <p v-for="(serviceSong, index) in servicesStore.sortedSongs">
+            <p @click="servicesStore.moveToSong( index )">{{ serviceSong.song.title }}</p>
         </p>
     </div>
 </template>
 
 <script lang="ts">
 import {useServicesStore} from "~/store/services.store";
+import {useSongsStore} from "~/store/songs.store";
 
 export default defineNuxtComponent({
 
     async setup() {
         return {
             route: useRoute(),
-            servicesStore: useServicesStore()
+            servicesStore: useServicesStore(),
+            songsStore: useSongsStore()
         }
     },
     mounted() {
         this.servicesStore.fetchServiceById( this.route.params.serviceId as string )
+
+        window.addEventListener('keydown', this.songsStore.handleKeyDown );
     },
-    methods: {
-        openPresenter(songId: number) {
-            window.open( window.location.origin + '/preview/song/' + songId , "_blank", "location=yes" );
-        },
-    }
+    methods: {}
 })
 </script>

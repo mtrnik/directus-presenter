@@ -14,18 +14,52 @@ export default defineNuxtComponent({
     async setup()  {
         return {
             route: useRoute(),
+            router: useRouter(),
             songsStore: useSongsStore()
         }
     },
 
     data() {
-        return {}
+        let intervalWatcher: NodeJS.Timer | undefined
+
+        return {
+            intervalWatcher,
+            currentlySelectedAnchor: ''
+        }
     },
     mounted() {
         this.songsStore.fetchSongById( this.route.params.songId as string )
 
-        window.addEventListener('keydown', this.songsStore.handleKeyDown );
+        this.watchLocalStorage()
     },
-    methods: {}
+    methods: {
+        watchLocalStorage() {
+            this.intervalWatcher = setInterval( () => {
+                this.readLocalStorage()
+            }, 100)
+        },
+        readLocalStorage() {
+            const liveSongId = localStorage.getItem('directus-presenter-live-song-id' )
+            const liveVerseAnchor = localStorage.getItem('directus-presenter-live-verse-anchor' )
+
+            if ( liveSongId !== this.route.params.songId as string ) {
+                this.router.replace( '/preview/song/' + liveSongId )
+            }
+
+            if ( liveVerseAnchor !== this.currentlySelectedAnchor ) {
+                this.currentlySelectedAnchor = liveVerseAnchor ?? ''
+                scrollToElement( this.currentlySelectedAnchor )
+            }
+        }
+    }
 })
+
+function scrollToElement(id: string) {
+    const element = document.getElementById(id);
+    element?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest',
+    });
+}
 </script>
