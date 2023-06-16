@@ -24,12 +24,17 @@ export interface Song {
     theme_name: string | null;
     search_title: string;
     search_lyrics: string;
-    verses: Verse[]
-    ordered_verses: Verse[]
+    verses: SongVerse[]
+    ordered_verses: SongVerse[]
     [key: string]: any; // Index signature for arbitrary string keys
 }
 
-export interface Verse {
+export interface SongAnchor {
+    id: string
+    index: number
+}
+
+export interface SongVerse {
     label: string;
     type: string;
     value: string;
