@@ -1,38 +1,24 @@
 <template>
     <div>
-        <p v-for="songId in sortedSongs">
+        <p v-for="songId in servicesStore.sortedSongs">
             <p @click="openPresenter( songId.song.id )">{{ songId.song.title }}</p>
         </p>
     </div>
 </template>
 
 <script lang="ts">
-import {Service, ServiceSong} from "~/types/types";
+import {useServicesStore} from "~/store/services.store";
 
 export default defineNuxtComponent({
+
     async setup() {
-        const {$directus} = useNuxtApp()
-        const route = useRoute()
-
-        const {data: service} = await useAsyncData('service', () => {
-            return $directus.items('services').readOne(route.params.serviceId as string, {
-                fields: [ '*', "songs.sort", "songs.song.*", ]
-            })
-        });
-
-        if (!service.value) throw createError({
-            statusCode: 404,
-            statusMessage: 'Service Not Found'
-        });
-
         return {
-            service: service.value as Service
+            route: useRoute(),
+            servicesStore: useServicesStore()
         }
     },
-    computed: {
-        sortedSongs(): ServiceSong[] {
-            return this.service.songs.sort(( a, b) => a.sort - b.sort )
-        }
+    mounted() {
+        this.servicesStore.fetchServiceById( this.route.params.serviceId as string )
     },
     methods: {
         openPresenter(songId: number) {

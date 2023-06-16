@@ -13,8 +13,7 @@ export const useSongsStore = defineStore('songs', {
         async fetchSongById( songId: string ) {
             const { $directus } = useNuxtApp()
 
-            const song = await $directus.items('songs').readOne( songId ) as Song
-            this.song = song
+            this.song = await $directus.items('songs').readOne( songId ) as Song
             this.song.verses = this.parseXmlToVerses( this.song )
             this.clearSpecialCharactersFromVerses( this.song )
             this.song.ordered_verses = this.prepareVersesOrder( this.song.verses, this.song.verse_order )
