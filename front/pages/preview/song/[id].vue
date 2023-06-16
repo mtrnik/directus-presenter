@@ -37,6 +37,11 @@ interface Verse {
     _id?: string
 }
 
+interface Anchor {
+    id: string
+    index: number
+}
+
 
 export default defineNuxtComponent({
     async setup()  {
@@ -54,6 +59,13 @@ export default defineNuxtComponent({
 
         return {
             song: song.value as Song
+        }
+    },
+    data() {
+        const currentAnchor: Anchor = { id: '', index: -1 }
+
+        return {
+            currentAnchor
         }
     },
     mounted() {
@@ -103,6 +115,10 @@ export default defineNuxtComponent({
             }
 
             this.song.ordered_verses = orderedVerses.slice()
+
+            if ( this.song.ordered_verses?.[0]._id ) {
+                this.currentAnchor = { id: this.song.ordered_verses[0]._id, index: 0 }
+            }
         },
 
         handleKeyDown(event: KeyboardEvent) {
@@ -120,18 +136,35 @@ export default defineNuxtComponent({
         },
 
         handleArrowUp() {
-            console.debug('handleArrowUp')
-            // Handle the arrow up key event
-            // Implement your logic here
+            if ( this.currentAnchor.index > 0 ) {
+                this.currentAnchor.index--
+                if ( this.song.ordered_verses[this.currentAnchor.index]._id ) {
+                    this.currentAnchor.id = this.song.ordered_verses[this.currentAnchor.index]._id ?? ''
+                    scrollToElement( this.currentAnchor.id )
+                }
+            }
         },
 
         handleArrowDown() {
-            console.debug('handleArrowDown')
-            // Handle the arrow down key event
-            // Implement your logic here
+            if ( this.currentAnchor.index < this.song.ordered_verses.length - 1 ) {
+                this.currentAnchor.index++
+                if ( this.song.ordered_verses[this.currentAnchor.index]._id ) {
+                    this.currentAnchor.id = this.song.ordered_verses[this.currentAnchor.index]._id ?? ''
+                    scrollToElement( this.currentAnchor.id )
+                }
+            }
         }
     }
 })
+
+function scrollToElement(id: string) {
+    const element = document.getElementById(id);
+    element?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest',
+    });
+}
 
 function xmlNodeToObject(node: Element): Partial<Song> {
     const obj: Partial<Song> = {};
