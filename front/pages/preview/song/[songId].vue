@@ -7,40 +7,12 @@
 </template>
 
 <script lang="ts">
-
-interface Song {
-    id: number;
-    user_created: string;
-    date_created: string;
-    user_updated: string | null;
-    date_updated: string | null;
-    title: string;
-    alternate_title: string;
-    lyrics: string;
-    verse_order: string | null;
-    copyright: string | null;
-    comments: string | null;
-    ccli_number: string | null;
-    theme_name: string | null;
-    search_title: string;
-    search_lyrics: string;
-    verses: Verse[]
-    ordered_verses: Verse[]
-    [key: string]: any; // Index signature for arbitrary string keys
-}
-
-interface Verse {
-    label: string;
-    type: string;
-    value: string;
-    _id?: string
-}
+import {Song, Verse} from "~/types/types";
 
 interface Anchor {
     id: string
     index: number
 }
-
 
 export default defineNuxtComponent({
     async setup()  {

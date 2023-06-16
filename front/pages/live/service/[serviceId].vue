@@ -1,22 +1,13 @@
 <template>
     <div>
         <p v-for="songId in sortedSongs">
-            <p @click="openPresenter( songId.song.id )">{{ songId.song.id }}</p>
+            <p @click="openPresenter( songId.song.id )">{{ songId.song.title }}</p>
         </p>
     </div>
 </template>
 
 <script lang="ts">
-
-interface Service {
-    id: number;
-    songs: SongRef[]
-}
-
-interface SongRef {
-    sort: number
-    song: { id: number }
-}
+import {Service, ServiceSong} from "~/types/types";
 
 export default defineNuxtComponent({
     async setup() {
@@ -25,7 +16,7 @@ export default defineNuxtComponent({
 
         const {data: service} = await useAsyncData('service', () => {
             return $directus.items('services').readOne(route.params.serviceId as string, {
-                fields: [ '*', "songs.sort", "songs.song.id", ]
+                fields: [ '*', "songs.sort", "songs.song.*", ]
             })
         });
 
@@ -39,7 +30,7 @@ export default defineNuxtComponent({
         }
     },
     computed: {
-        sortedSongs(): SongRef[] {
+        sortedSongs(): ServiceSong[] {
             return this.service.songs.sort(( a, b) => a.sort - b.sort )
         }
     },
