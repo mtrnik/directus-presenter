@@ -1,10 +1,9 @@
 <template>
     <div>
         <p v-for="songId in sortedSongs">
-            <nuxt-link :to="'http://localhost:3000/preview/song/' + songId.song.id">{{ songId.song.id }}</nuxt-link>
+            <p @click="openPresenter( songId.song.id )">{{ songId.song.id }}</p>
         </p>
     </div>
-
 </template>
 
 <script lang="ts">
@@ -43,6 +42,11 @@ export default defineNuxtComponent({
         sortedSongs(): SongRef[] {
             return this.service.songs.sort(( a, b) => a.sort - b.sort )
         }
+    },
+    methods: {
+        openPresenter(songId: number) {
+            window.open( window.location.origin + '/preview/song/' + songId , "_blank", "location=yes" );
+        },
     }
 })
 </script>
