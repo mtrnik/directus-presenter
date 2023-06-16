@@ -31,6 +31,7 @@ export default defineNuxtComponent({
         this.songsStore.fetchSongById( this.route.params.songId as string )
 
         this.watchLocalStorage()
+        window.addEventListener('keydown', this.songsStore.handleKeyDown );
     },
     methods: {
         watchLocalStorage() {
@@ -39,12 +40,7 @@ export default defineNuxtComponent({
             }, 100)
         },
         readLocalStorage() {
-            const liveSongId = localStorage.getItem('directus-presenter-live-song-id' )
             const liveVerseAnchor = localStorage.getItem('directus-presenter-live-verse-anchor' )
-
-            if ( liveSongId !== this.route.params.songId as string ) {
-                this.router.replace( '/preview/song/' + liveSongId )
-            }
 
             if ( liveVerseAnchor !== this.currentlySelectedAnchor ) {
                 this.currentlySelectedAnchor = liveVerseAnchor ?? ''

@@ -29,7 +29,7 @@ export const useServicesStore = defineStore('services', {
 
         goLive() {
             const serviceSong = this.sortedSongs[ 0 ]
-            window.open( window.location.origin + '/preview/song/' + serviceSong.song.id , "_blank", "location=yes" );
+            window.open( window.location.origin + '/live/song/' + serviceSong.song.id , "_blank", "location=yes" );
 
             this.moveToSong( 0 )
         },
