@@ -36,14 +36,12 @@ export const useServicesStore = defineStore('services', {
 
 
         moveToPreviousSong() {
-            console.debug('this.liveSongIndex', this.liveSongIndex)
             if ( this.liveSongIndex > 0 ) {
                 this.moveToSong( this.liveSongIndex - 1 )
             }
         },
 
         moveToNextSong() {
-            console.debug('this.liveSongIndex', this.liveSongIndex)
             if ( this.liveSongIndex < this.sortedSongs.length - 1 ) {
                 this.moveToSong( this.liveSongIndex + 1 )
             }
@@ -53,8 +51,13 @@ export const useServicesStore = defineStore('services', {
             this.liveSongIndex = index
             const serviceSong = this.sortedSongs[ index ]
             useSongsStore().song = serviceSong.song
+
             localStorage.setItem('directus-presenter-live-song-id', serviceSong.song.id.toString() )
-            localStorage.setItem('directus-presenter-live-verse-anchor', '' )
+
+            const currentAnchorId = serviceSong.song.ordered_verses?.[0]._id ?? ''
+
+            localStorage.setItem('directus-presenter-live-verse-anchor', currentAnchorId )
+            useSongsStore().currentAnchor = { id: currentAnchorId, index: 0 }
         }
     },
 })

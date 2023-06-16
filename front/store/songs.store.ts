@@ -23,7 +23,6 @@ export const useSongsStore = defineStore('songs', {
         },
 
         processSong(song: Song): Song {
-            console.debug('processSong', song)
             song.verses = this.parseXmlToVerses( song )
             this.clearSpecialCharactersFromVerses( song )
             song.ordered_verses = this.prepareVersesOrder( song.verses, song.verse_order )
@@ -92,7 +91,6 @@ export const useSongsStore = defineStore('songs', {
                 this.currentAnchor.index--
                 this.changeSelectedSongVerse()
             } else {
-                this.currentAnchor = {  id: '', index: -1 } as SongAnchor
                 useServicesStore().moveToPreviousSong()
             }
         },
@@ -102,7 +100,6 @@ export const useSongsStore = defineStore('songs', {
                 this.currentAnchor.index++
                 this.changeSelectedSongVerse()
             } else {
-                this.currentAnchor = {  id: '', index: -1 } as SongAnchor
                 useServicesStore().moveToNextSong()
             }
         },
